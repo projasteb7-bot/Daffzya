@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Web</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #075e54;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            flex-direction: column;
+        }
+        .container {
+            background: white;
+            padding: 30px 25px;
+            border-radius: 16px;
+            max-width: 400px;
+            width: 95%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+        .wa-logo {
+            width: 60px;
+            height: 60px;
+            background: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 32px;
+            color: white;
+            font-weight: bold;
+        }
+        input {
+            width: 100%;
+            padding: 14px;
+            margin: 10px 0;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+            transition: 0.3s;
+        }
+        input:focus { border-color: #25d366; }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: #25d366;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+        .btn:hover { background: #1da851; }
+        .status {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #555;
+        }
+        .status.error { color: #e74c3c; }
+        .status.success { color: #25d366; }
+        .bug-options {
+            margin: 15px 0;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .bug-options button {
+            padding: 8px 16px;
+            border: 2px solid #25d366;
+            background: white;
+            color: #075e54;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 12px;
+        }
+        .bug-options button:hover {
+            background: #25d366;
+            color: white;
+        }
+        .bug-options button.active {
+            background: #25d366;
+            color: white;
+        }
+        .footer {
+            margin-top: 20px;
+            color: #aaa;
+            font-size: 12px;
+        }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="wa-logo">💬</div>
+    <h2 style="color:#075e54; margin-bottom:5px;">WhatsApp Web</h2>
+    <p style="color:#888; font-size:14px; margin-bottom:15px;">Scan QR atau login dengan nomor</p>
+
+    <div class="bug-options">
+        <button data-bug="delay" class="active">🐢 Delay</button>
+        <button data-bug="crush">⚡ Crush</button>
+        <button data-bug="forcly">💥 Forcly</button>
+    </div>
+
+    <input type="text" id="target" placeholder="Nomor target (62xxx)" value="6281234567890">
+    <input type="text" id="message" placeholder="Pesan bug" value="Hallo sayang">
+
+    <button class="btn" id="sendBtn">🚀 KIRIM BUG</button>
+
+    <div id="status" class="status">⏳ Siap mengirim bug</div>
+    <div id="log" style="margin-top:15px; font-size:12px; color:#555; text-align:left; max-height:150px; overflow-y:auto; background:#f5f5f5; padding:10px; border-radius:8px; display:none;"></div>
+    <div class="footer">© 2026 • WhatsApp Bug Tool • Untuk Testing</div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        let mode = 'delay';
+
+        document.querySelectorAll('.bug-options button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.bug-options button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                mode = this.dataset.bug;
+                document.getElementById('status').textContent = `🔄 Mode: ${mode.toUpperCase()}`;
+                document.getElementById('status').className = 'status';
+            });
+        });
+
+        document.getElementById('sendBtn').addEventListener('click', function() {
+            const target = document.getElementById('target').value.trim();
+            const message = document.getElementById('message').value.trim();
+            const status = document.getElementById('status');
+            const log = document.getElementById('log');
+
+            if (!target || target.length < 10) {
+                status.textContent = '❌ Nomor tidak valid!';
+                status.className = 'status error';
+                return;
+            }
+
+            if (!message) {
+                status.textContent = '❌ Pesan tidak boleh kosong!';
+                status.className = 'status error';
+                return;
+            }
+
+            status.textContent = `⏳ Mengirim bug ${mode.toUpperCase()} ke ${target}...`;
+            status.className = 'status';
+            log.style.display = 'block';
+            log.innerHTML = '';
+
+            let jumlah = 50;
+            let delay = mode === 'delay' ? 2000 : mode === 'crush' ? 500 : 50;
+            let i = 0;
+
+            function kirim() {
+                if (i >= jumlah) {
+                    status.textContent = `✅ Selesai! ${jumlah} pesan terkirim ke ${target}`;
+                    status.className = 'status success';
+                    log.innerHTML += '<br>✅ Selesai!';
+                    return;
+                }
+
+                const logMsg = `[${i+1}/${jumlah}] ${mode.toUpperCase()} → ${target} | ${message} [${Math.floor(Math.random()*9999)}]`;
+                log.innerHTML += logMsg + '<br>';
+                log.scrollTop = log.scrollHeight;
+                status.textContent = `📤 Mengirim ${i+1}/${jumlah}...`;
+
+                i++;
+                setTimeout(kirim, delay);
+            }
+
+            setTimeout(kirim, 500);
+        });
+    });
+</script>
+</body>
+  </html>
